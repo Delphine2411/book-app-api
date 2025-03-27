@@ -1,27 +1,19 @@
-
-
-
 const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
+const connectDB = require('./config/db');
 const bookRoutes = require('./routes/bookRoutes');
 const authorRoutes = require('./routes/authorRoutes');
 const authRoutes = require('./routes/authRoutes');
+require('dotenv').config();
 
 const app = express();
+connectDB();
+
+app.use(express.json());
+
+app.use('/api', bookRoutes);
+app.use('/api', authorRoutes);
+app.use('/api', authRoutes);
+
+
 const PORT = 3000;
-
-// Connecter à la base de données MongoDB
-mongoose.connect('mongodb+srv://kpankpand:Delphine@cluster0.87grh.mongodb.net/app', { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connexion à MongoDB réussie'))
-  .catch(err => console.log('Erreur de connexion à MongoDB:', err));
-
-app.use(bodyParser.json());
-
-app.use('/api/books', bookRoutes);
-app.use('/api/authors', authorRoutes);
-app.use('/api/auth', authRoutes);
-
-app.listen(PORT, () => {
-  console.log(`Serveur en écoute sur le port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Serveur démarré sur le port http://localhost:${PORT}`));

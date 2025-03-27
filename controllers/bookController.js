@@ -1,76 +1,55 @@
-//Importation du model book vers controllers
-import Book from "../models/bookModel";
+const Book = require('../models/bookModel');
 
-//Créer book
-
-export const postBook = async (req, res) => {
-    const {title, author,publishedYear,genre} = req.body
-    try {   
-        const newBook = new Book({title, author,publishedYear,genre});
-        await newBook.save();
-        res.status(201).json(newBook);
-    } catch (err) {
-        res.status(500).json({ error: "Il y a eu une erreur lors de la création du livre" });
+// Créer un livre
+exports.createBook = async (req, res) => {
+    try {
+        const book = new Book(req.body);
+        await book.save();
+        res.status(201).json(book);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
 };
 
-// get
-
-  export const getBooks = async (req, res) => {
+// Lire tous les livres
+exports.getBooks = async (req, res) => {
     try {
-      const books = await Book.find().populate('author');
-      res.status(200).json(books);
+        const books = await Book.find();
+        res.json(books);
     } catch (error) {
-      res.status(500).json({ message: 'Erreur lors de la récupération des livres', error });
+        res.status(500).json({ error: error.message });
     }
-  };
+};
 
-  // getById
-
-  export const getBookById = async (req, res) => {
+// Lire un seul livre
+exports.getBookById = async (req, res) => {
     try {
-      const book = await Book.findById(req.params).populate('author');
-      if (!book) {
-        return res.status(404).json({ message: 'Livre introuvable' });
-      }
-      res.status(200).json(book);
+        const book = await Book.findById(req.params.id);
+        if (!book) return res.status(404).json({ message: "Livre non trouvé" });
+        res.json(book);
     } catch (error) {
-      res.status(500).json({ message: 'Erreur de récupération ', error });
+        res.status(500).json({ error: error.message });
     }
-  };
+};
 
-  //put
-
-  export const putBook = async (req, res) => {
-    const { id } = req.params;
-    const { title, author, publishedDate, genre } = req.body;
+// Modifier un livre
+exports.updateBook = async (req, res) => {
     try {
-      const miseAjourBook = await Book.findByIdAndUpdate(
-        id,
-        { title, author, publishedDate, genre },
-        { new: true }
-      );
-      if (!miseAjourBook) {
-        return res.status(404).json({ message: 'Livre non trouvé' });
-      }
-      res.status(200).json(miseAjourBook);
+        const book = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!book) return res.status(404).json({ message: "Livre non trouvé" });
+        res.json(book);
     } catch (error) {
-      res.status(500).json({ message: 'Erreur lors de la mise à jour du livre', error });
+        res.status(400).json({ error: error.message });
     }
-  };
+};
 
-  //delete
-
-  export const deleteBook = async (req, res) => {
+// Supprimer un livre
+exports.deleteBook = async (req, res) => {
     try {
-      const deletedBook = await Book.findByIdAndDelete(req.params);
-      if (!deletedBook) {
-        return res.status(404).json({ message: 'Livre non trouvé' });
-      }
-      res.status(200).json({ message: 'Livre supprimé avec succès' });
+        const book = await Book.findByIdAndDelete(req.params.id);
+        if (!book) return res.status(404).json({ message: "Livre non trouvé" });
+        res.json({ message: "Livre supprimé" });
     } catch (error) {
-      res.status(500).json({ message: 'Erreur lors de la suppression du livre', error });
+        res.status(500).json({ error: error.message });
     }
-  };
-  
-  
+};

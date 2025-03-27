@@ -1,14 +1,13 @@
 const express = require('express');
-const authorController = require('../controllers/authorController');
-const authMiddleware = require('../middleware/authMiddleware');
-
+const { createAuthor, getAuthors, getAuthorById, updateAuthor, deleteAuthor } = require('../controllers/authorController');
 const router = express.Router();
 
-router.post('/', authMiddleware.authenticateJWT, authorController.putAuthor);
-router.get('/', authorController.getAuthors);
-router.put('/:id', authMiddleware.authenticateJWT, authorController.putAuthor);
-router.delete('/:id', authMiddleware.authenticateJWT, authorController.deleteAuthor);
-
+router.post('/authors', createAuthor);
+router.get('/authors', getAuthors);
+router.get('/authors/:id', getAuthorById);
+router.put('/authors/:id', updateAuthor);
+router.delete('/authors/:id', deleteAuthor);
 
 module.exports = router;
+
 

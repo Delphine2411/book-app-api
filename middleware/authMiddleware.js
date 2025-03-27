@@ -1,19 +1,14 @@
 const jwt = require('jsonwebtoken');
 
-const generateToken = (user) => {
+module.exports = (req, res, next) => {
+    const token = req.header('Authorization');
+    if (!token) return res.status(401).json({ message: "Accès refusé" });
 
-    return jwt.sign({ id: user._id }, 'secret_key', { expiresIn: '1h' });
-
-};
-
-const authMiddleware =(req, res, next) =>{
-    const token =req.header("Authorization");
-    if (!token) return res.status(401).json({message:"accès interdit"}); 
     try {
-        const verified = jwt.verify(token, "secret_key");
-        req.user = verified
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
         next();
     } catch (error) {
-        res.status(400).json({message: "Token invalid"})
+        res.status(400).json({ message: "Token invalide" });
     }
 };
